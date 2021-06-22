@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "cricetus",
   "version": "1.0.0",
   "description": "electron app",
   "main": "main.js",
@@ -23,12 +23,14 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "public/favicon.ico"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "my_app"
+            "name": "cricetus"
           }
         },
         {
