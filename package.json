@@ -4,6 +4,7 @@
   "description": "electron app",
   "main": "main.js",
   "scripts": {
+    "build:web": "cd front-end && npm run build",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
@@ -16,7 +17,8 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.57",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.57",
     "@electron-forge/maker-zip": "^6.0.0-beta.57",
-    "electron": "^13.1.2"
+    "electron": "^13.1.2",
+    "electron-log": "^4.3.5"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
@@ -24,7 +26,8 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "public/favicon.ico"
+        "icon": "public/favicon.ico",
+        "dir": "./"
       },
       "makers": [
         {
