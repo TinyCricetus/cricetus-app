@@ -1,25 +1,28 @@
 'use strict'
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const path = require("path")
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    icon: path.resolve(__dirname, './public/favicon.ico'),
     width: 1600,
     height: 900,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  if (process.env.STAGE === 'development') {
+    mainWindow.loadURL('http://localhost:8080')
+  } else {
+    mainWindow.loadFile(path.resolve(__dirname, './web/dist/index.html'))
+  }
   // and load the index.html of the app.
-  mainWindow.loadFile('web/index.html')
-  // mainWindow.loadURL('http://localhost:8080')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -48,3 +51,14 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. 也可以拆分成几个文件，然后用 require 导入。
+
+const menu = new Menu()
+menu.append(new MenuItem({
+  submenu: [{
+    role: 'reload',
+    accelerator: 'F5',
+    click: () => { console.log('reload!') }
+  }]
+}))
+
+Menu.setApplicationMenu(menu)

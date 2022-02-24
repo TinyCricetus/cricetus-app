@@ -4,15 +4,24 @@
   "description": "electron app",
   "main": "main.js",
   "scripts": {
-    "build:web": "cd front-end && npm run build",
-    "start": "electron .",
+    "build:web": "cd web && npm run build",
+    "start": "concurrently \"cross-env STAGE=development electron .\" \"cd web && npm run serve\"",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
   "author": "cricetus",
   "license": "ISC",
   "devDependencies": {
+    "concurrently": "^7.0.0",
+    "cross-env": "^7.0.3",
     "electron": "^16.0.1",
     "electron-builder": "^22.14.5"
+  },
+  "build": {
+    "appId": "com.cricetus.app",
+    "productName": "仓鼠小应用",
+    "win": {
+      "icon": "./public/favicon.ico"
+    }
   }
 }
