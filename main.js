@@ -1,7 +1,7 @@
 'use strict'
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, MenuItem } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
 const path = require("path")
 
 function createWindow() {
@@ -11,8 +11,10 @@ function createWindow() {
     width: 1600,
     height: 900,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false
+    },
+    titleBarStyle: 'hidden'
   })
   if (process.env.STAGE === 'development') {
     mainWindow.loadURL('http://localhost:8080')
@@ -23,6 +25,14 @@ function createWindow() {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
+  
+  ipcMain.on('test-message', () => {
+    app.quit()
+  })
+  
+  ipcMain.once('window-reload', () => {
+    mainWindow.reload()
+  })
 }
 
 // This method will be called when Electron has finished
@@ -54,11 +64,18 @@ app.on('window-all-closed', function () {
 
 const menu = new Menu()
 menu.append(new MenuItem({
-  submenu: [{
-    role: 'reload',
-    accelerator: 'F5',
-    click: () => { console.log('reload!') }
-  }]
+  submenu: [
+    {
+      role: 'reload',
+      accelerator: 'F5',
+      click: () => { console.log('reload!') }
+    },
+    {
+      role: 'toggleDevTools',
+      accelerator: 'F12',
+      click: () => { console.log('show console!') }
+    }
+  ]
 }))
 
 Menu.setApplicationMenu(menu)

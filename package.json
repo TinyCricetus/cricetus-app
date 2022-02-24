@@ -20,8 +20,6 @@
   "build": {
     "appId": "com.cricetus.app",
     "productName": "仓鼠小应用",
-    "win": {
-      "icon": "./public/favicon.ico"
-    }
+    "icon": "./public/favicon.ico"
   }
 }
