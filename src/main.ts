@@ -7,13 +7,15 @@ function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, '../public/favicon.ico'),
-    width: 1600,
-    height: 900,
+    width: 600,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, '../src-dist/', 'preload.js'),
       webSecurity: false
     },
-    titleBarStyle: 'hidden'
+    titleBarStyle: 'hidden',
+    maximizable: false,
+    resizable: false
   })
   if (process.env.STAGE === 'development') {
     mainWindow.loadURL('http://localhost:8080')

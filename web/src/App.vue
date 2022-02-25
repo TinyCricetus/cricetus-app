@@ -1,36 +1,27 @@
 <template>
-  <nav>
-    <button @click="clickMe">应用关闭</button>
-    <button @click="shutdown">10分钟后关机</button>
-    <button @click="cancelShutdown">取消自动关机</button>
-  </nav>
-  <router-view/>
+  <router-view />
 </template>
 
-<script setup lang="ts">
-function clickMe() {
-  window.ipcRenderer.sendCloseMsg()
-}
-
-function shutdown() {
-  window.ipcRenderer.sendShutdownMsg(600)
-}
-
-function cancelShutdown() {
-  window.ipcRenderer.sendShutdownMsg(-1)
-}
-</script>
-
 <style lang="scss">
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 
-button {
-  margin: 0px 10px;
+ul,
+li {
+  list-style: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
 }
 </style>
