@@ -1,8 +1,8 @@
 <template>
   <nav>
-    <p @click="clickMe">click me!</p>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <button @click="clickMe">应用关闭</button>
+    <button @click="shutdown">10分钟后关机</button>
+    <button @click="cancelShutdown">取消自动关机</button>
   </nav>
   <router-view/>
 </template>
@@ -10,6 +10,14 @@
 <script setup lang="ts">
 function clickMe() {
   window.ipcRenderer.sendCloseMsg()
+}
+
+function shutdown() {
+  window.ipcRenderer.sendShutdownMsg(600)
+}
+
+function cancelShutdown() {
+  window.ipcRenderer.sendShutdownMsg(-1)
 }
 </script>
 
@@ -22,16 +30,7 @@ function clickMe() {
   color: #2c3e50;
 }
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+button {
+  margin: 0px 10px;
 }
 </style>
