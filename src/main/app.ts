@@ -8,7 +8,7 @@ export function createWindow() {
     width: 600,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../../src-dist/', 'Preload.js'),
+      preload: path.join(__dirname, '../../src-dist/', 'preload.js'),
       webSecurity: false
     },
     titleBarStyle: 'hidden',
