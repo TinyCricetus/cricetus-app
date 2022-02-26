@@ -6,6 +6,7 @@
     "jsx": "preserve",
     "moduleResolution": "node",
     "skipLibCheck": true,
+    "strictNullChecks": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

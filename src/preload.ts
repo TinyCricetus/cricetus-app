@@ -5,13 +5,16 @@ import { checkWebAvailable } from './renderer/DevelopHelper'
 contextBridge.exposeInMainWorld('ipcRenderer',
   {
     sendCloseMsg: () => {
-      ipcRenderer.send('test-message')
+      ipcRenderer.send('app-close')
     },
     sendReloadMsg: () => {
       ipcRenderer.send('window-reload')
     },
     sendShutdownMsg: (delaySeconds: number) => {
       ipcRenderer.send('computer-shutdown', delaySeconds)
+    },
+    invokeToGetSystemColor: (): Promise<string> => {
+      return ipcRenderer.invoke('get-system-color')
     }
   }
 )

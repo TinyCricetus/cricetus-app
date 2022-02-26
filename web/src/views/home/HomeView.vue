@@ -1,8 +1,7 @@
 <template>
-  <div class="main-container">
-    <Header></Header>
+  <div>
     <ul class="grid-menu">
-      <li v-for="item in menuItems" :key="item.title">
+      <li v-for="item in menuItems" :key="item.index" @click="item.itemFunction">
         <span class="grid-content">{{ item.content }}</span>
       </li>
     </ul>
@@ -10,13 +9,14 @@
 </template>
 
 <script setup lang="ts">
-import Header from './Header.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const menuItems = [
-  { title: '1', content: '自动关机' },
-  { title: '2', content: '更多功能，敬请期待...' },
-  { title: '3', content: '更多功能，敬请期待...' },
-  { title: '4', content: '更多功能，敬请期待...' }
+  { index: 1, content: '开启自动关机', itemFunction: () => { router.push('/shutdown') } },
+  { index: 2, content: '更多功能，敬请期待...' },
+  { index: 3, content: '更多功能，敬请期待...' },
+  { index: 4, content: '更多功能，敬请期待...' }
 ]
 </script>
 
@@ -26,27 +26,34 @@ $app-height: 600px;
 * {
   user-select: none;
 }
-.main-container {
-  position: relative;
-  width: $app-width;
-  height: $app-height;
-}
 .grid-menu {
-  $grid-width: $app-width / 2 - 2px;
-  $grid-height: ($app-height - 30px) / 2 - 2px;
+  $grid-width: $app-width / 2;
+  $grid-height: ($app-height - 30px) / 2;
 
   display: grid;
   grid-template-columns: 300px 300px;
   grid-template-rows: 285px 285px;
   li {
-    background-image: url(./assets/menu_item_bg.png);
     cursor: pointer;
     display: inline-block;
     overflow: hidden;
-    border: 1px solid gray;
     width: $grid-width;
     height: $grid-height;
     background-color: aqua;
+    &:nth-child(1) {
+      background-image: url(./assets/1.png);
+    }
+    &:nth-child(2) {
+      background-image: url(./assets/2.png);
+    }
+    &:nth-child(3) {
+      border-radius: 0px 0px 0px 10px;
+      background-image: url(./assets/3.png);
+    }
+    &:nth-child(4) {
+      border-radius: 0px 0px 10px 0px;
+      background-image: url(./assets/4.png);
+    }
     &:hover {
       .grid-content {
         margin-top: 0px;
@@ -54,6 +61,7 @@ $app-height: 600px;
     }
     .grid-content {
       text-align: center;
+      color: rgb(150, 150, 150);
       line-height: $grid-height;
       font-size: 30px;
       opacity: 0.8;

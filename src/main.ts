@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-import { app, BrowserWindow, Menu, MenuItem, ipcMain } from 'electron'
+import { app, BrowserWindow, Menu, MenuItem, ipcMain, systemPreferences } from 'electron'
 import path from "path"
 import childProcess from 'child_process'
 
@@ -14,8 +14,8 @@ function createWindow() {
       webSecurity: false
     },
     titleBarStyle: 'hidden',
-    maximizable: false,
-    resizable: false
+    resizable: false,
+    transparent: true
   })
   if (process.env.STAGE === 'development') {
     mainWindow.loadURL('http://localhost:8080')
@@ -26,11 +26,11 @@ function createWindow() {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
-  
-  ipcMain.on('test-message', () => {
+
+  ipcMain.on('app-close', () => {
     app.quit()
   })
-  
+
   ipcMain.once('window-reload', () => {
     mainWindow.reload()
   })
@@ -41,6 +41,10 @@ function createWindow() {
     } else {
       childProcess.exec('shutdown -s -t ' + delaySeconds)
     }
+  })
+
+  ipcMain.handle('get-system-color', () => {
+    return systemPreferences.getColor('active-border')
   })
 }
 

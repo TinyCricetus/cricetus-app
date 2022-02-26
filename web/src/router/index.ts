@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/home/Home.vue'
+import HomeView from '../views/home/HomeView.vue'
+import ShutdownView from '../views/shutdown/ShutdownView.vue' 
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -7,6 +8,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'home',
     component: HomeView
   },
+  {
+    path: '/shutdown',
+    name: 'shutdown',
+    component: ShutdownView
+  }
   // {
   //   path: '/about',
   //   name: 'about',
