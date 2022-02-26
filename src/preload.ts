@@ -1,7 +1,7 @@
 // preload.js
 import { contextBridge, ipcRenderer } from 'electron'
-import { __DEV__ } from './Env'
-import { checkWebAvailable } from './renderer/DevelopHelper'
+import { __DEV__ } from './env'
+import { checkWebAvailable } from './renderer/develop-helper'
 
 contextBridge.exposeInMainWorld('ipcRenderer',
   {

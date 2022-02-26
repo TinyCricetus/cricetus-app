@@ -2,7 +2,7 @@
   "name": "cricetus",
   "version": "1.0.0",
   "description": "electron app",
-  "main": "./src-dist/Main.js",
+  "main": "./src-dist/main.js",
   "scripts": {
     "build:web": "cd web && npm run build",
     "start": "tsc && concurrently \"cross-env STAGE=development electron .\" \"cd web && npm run serve\"",

@@ -1,6 +1,6 @@
 import { app } from 'electron'
-import { createWindow, initApp, initAppMenu } from './main/App'
-import { initIpcMain } from './main/IpcMain'
+import { createWindow, initApp, initAppMenu } from './main/app'
+import { initIpcMain } from './main/ipc-main'
 
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItem } from 'electron'
 import path from "path"
-import { __DEV__ } from '../Env'
+import { __DEV__ } from '../env'
 
 export function createWindow() {
   const mainWindow = new BrowserWindow({
