@@ -2,12 +2,13 @@
   "name": "cricetus",
   "version": "1.0.0",
   "description": "electron app",
-  "main": "./src-dist/main.js",
+  "main": "./src-dist/Main.js",
   "scripts": {
     "build:web": "cd web && npm run build",
     "start": "tsc && concurrently \"cross-env STAGE=development electron .\" \"cd web && npm run serve\"",
+    "start:electron": "tsc && electron .",
     "pack": "tsc && cd web && npm run build && cd .. && electron-builder --dir",
-    "dist": "tsc && cd web && npm run build && cd .. && electron-builder"
+    "build": "tsc && cd web && npm run build && cd .. && electron-builder"
   },
   "author": "cricetus",
   "license": "ISC",

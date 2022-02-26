@@ -13,8 +13,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const menuItems = [
-  { index: 1, content: '开启自动关机', itemFunction: () => { router.push('/shutdown') } },
-  { index: 2, content: '更多功能，敬请期待...' },
+  { index: 1, content: '自动关机部署', itemFunction: () => { router.push('/shutdown') } },
+  { index: 2, content: '网易云听歌记录', itemFunction: () => { router.push('/history') } },
   { index: 3, content: '更多功能，敬请期待...' },
   { index: 4, content: '更多功能，敬请期待...' }
 ]

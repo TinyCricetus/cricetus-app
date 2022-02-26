@@ -1,5 +1,6 @@
 // preload.js
 import { contextBridge, ipcRenderer } from 'electron'
+import { __DEV__ } from './Env'
 import { checkWebAvailable } from './renderer/DevelopHelper'
 
 contextBridge.exposeInMainWorld('ipcRenderer',
@@ -15,12 +16,15 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     invokeToGetSystemColor: (): Promise<string> => {
       return ipcRenderer.invoke('get-system-color')
+    },
+    invokeToGetCloudMusicHistory: (): Promise<any> => {
+      return ipcRenderer.invoke('get-cloud-music-history')
     }
   }
 )
 
 
-if (process.env.STAGE === 'development') {
+if (__DEV__) {
   checkWebAvailable(() => {
     ipcRenderer.send('window-reload')
   })

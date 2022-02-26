@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="shutdown-container">
     <div class="time-picker">
       <NTimePicker placeholder="请选择关机时间（时分秒）" :on-update:value="onTimeValueUpdated"></NTimePicker>
     </div>
@@ -42,8 +42,14 @@ function cancelShutdown() {
 </script>
 
 <style lang="scss" scoped>
+.shutdown-container {
+  background-color: #444;
+  width: 600px;
+  height: 570px;
+  padding-top: 200px;
+}
 .time-picker {
-  margin: 200px auto 0px auto;
+  margin: 0 auto;
   width: 250px;
 }
 .button-list {

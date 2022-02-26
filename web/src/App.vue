@@ -2,7 +2,7 @@
   <NConfigProvider :locale="zhCN" :date-locale="dateZhCN">
     <div class="main-container">
       <Header></Header>
-      <NMessageProvider placement="bottom">
+      <NMessageProvider placement="top">
         <router-view />
       </NMessageProvider>
     </div>
@@ -37,8 +37,8 @@ li {
   position: relative;
   width: 600px;
   height: 600px;
-  background-color: #444;
   margin: 0 auto;
   border-radius: 10px;
+  overflow: hidden;
 }
 </style>

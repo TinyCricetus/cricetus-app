@@ -34,12 +34,16 @@ $common-height: 30px;
   transition-duration: 0.1s;
 }
 .ui-header {
+  z-index: 66;
   -webkit-app-region: drag;
   width: 100%;
   height: $common-height;
   border-radius: 10px 10px 0px 0px;
+  position: sticky;
+  top: 0px;
 }
 button {
+  z-index: 67;
   outline: none;
   border: none;
   background-color: transparent;

@@ -23,6 +23,9 @@ class IpcRenderer {
   invokeToGetSystemColor() {
     return Promise.resolve('rgb(167, 167, 167)')
   }
+  invokeToGetCloudMusicHistory() {
+    return Promise.resolve([])
+  }
 }
 
 class ElectronIpcRenderer extends IpcRenderer {
@@ -40,5 +43,9 @@ class ElectronIpcRenderer extends IpcRenderer {
 
   invokeToGetSystemColor() {
     return window.ipcRenderer.invokeToGetSystemColor()
+  }
+
+  invokeToGetCloudMusicHistory() {
+    return window.ipcRenderer.invokeToGetCloudMusicHistory()
   }
 }
