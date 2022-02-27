@@ -1,37 +1,44 @@
 <template>
-  <nav>
-    <p @click="clickMe">click me!</p>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <NConfigProvider :locale="zhCN" :date-locale="dateZhCN">
+    <div class="main-container">
+      <Header></Header>
+      <NMessageProvider placement="top">
+        <router-view />
+      </NMessageProvider>
+    </div>
+  </NConfigProvider>
 </template>
 
 <script setup lang="ts">
-function clickMe() {
-  window.ipcRenderer.sendCloseMsg()
-}
+import Header from './Header.vue'
+import { NConfigProvider, zhCN, dateZhCN, NMessageProvider } from 'naive-ui'
 </script>
 
 <style lang="scss">
+body {
+  margin: 0px;
+  padding: 0px;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
 }
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+ul,
+li {
+  list-style: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+.main-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
 }
 </style>
