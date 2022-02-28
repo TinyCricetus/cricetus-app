@@ -40,5 +40,6 @@ li {
   height: 600px;
   margin: 0 auto;
   border-radius: 10px;
+  overflow: hidden;
 }
 </style>
