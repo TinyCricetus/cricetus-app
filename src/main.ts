@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { __DEV__ } from './env'
 import { createWindow, initApp, initAppMenu } from './main/app'
 import { initIpcMain } from './main/ipc-main'
 
@@ -12,8 +13,11 @@ if (!gotTheLock) {
   app.whenReady().then(() => {
     const mainWindow = createWindow()
     initApp(mainWindow)
-    initAppMenu()
     initIpcMain(mainWindow)
+    
+    if (__DEV__) {
+      initAppMenu()
+    }
   })
 }
 
