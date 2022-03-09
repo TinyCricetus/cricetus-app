@@ -11,8 +11,9 @@
 ![功能1-1](./screenshot/1-1.png)
 ![功能2](./screenshot/2.png)
 ![功能2-1](./screenshot/2-1.png)
+![功能3](./screenshot//3.png)
+![功能3-1](./screenshot/3-1.png)
 ![功能5](./screenshot/5.png)
 
-
 ## 简单说明
-目前的想法有限，只实现了两个小功能，暂时还没有什么好的点子。
+目前的想法有限，只实现了三个小功能，暂时还没有什么好的点子。
