@@ -18,6 +18,7 @@ import { NConfigProvider, zhCN, dateZhCN, NMessageProvider } from 'naive-ui'
 body {
   margin: 0px;
   padding: 0px;
+  overflow: hidden;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
