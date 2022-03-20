@@ -55,22 +55,22 @@ button {
 .close-button {
   height: $common-height;
   width: $common-height;
-  background-image: url(./assets/CloseCircleOutline.svg);
+  background-image: url(./assets/images/CloseCircleOutline.svg);
   &:hover {
-    background-image: url(./assets/CloseCircleSharp.svg);
+    background-image: url(./assets/images/CloseCircleSharp.svg);
   }
   &:active {
-    background-image: url(./assets/CloseCircleOutline.svg);
+    background-image: url(./assets/images/CloseCircleOutline.svg);
   }
 }
 .home-button {
   margin-left: 5px;
-  background-image: url(./assets/HomeOutline.svg);
+  background-image: url(./assets/images/HomeOutline.svg);
   &:hover {
-    background-image: url(./assets/Home.svg);
+    background-image: url(./assets/images/Home.svg);
   }
   &:active {
-    background-image: url(./assets/HomeSharp.svg);
+    background-image: url(./assets/images/HomeSharp.svg);
   }
 }
 </style>

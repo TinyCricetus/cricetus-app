@@ -1,29 +1,29 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/home/home-view.vue'
-import ShutdownView from '../views/shutdown/shutdown-view.vue' 
-import MusicHistoryView from '../views/music-history/music-history-view.vue'
-import TextBusView from '../views/textbus/textbus-view.vue'
+import HomeComponent from '../views/home/home.component.vue'
+import ShutdownComponent from '../views/shutdown/shutdown.component.vue' 
+import MusicHistoryComponent from '../views/music-history/music-history.component.vue'
+import MarkdownComponent from '../views/markdown/markdown.component.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeComponent
   },
   {
     path: '/shutdown',
     name: 'shutdown',
-    component: ShutdownView
+    component: ShutdownComponent
   },
   {
     path: '/history',
     name: 'history',
-    component: MusicHistoryView
+    component: MusicHistoryComponent
   },
   {
-    path: '/textbus',
-    name: 'textbus',
-    component: TextBusView
+    path: '/markdown',
+    name: 'markdown',
+    component: MarkdownComponent
   }
   // {
   //   path: '/about',

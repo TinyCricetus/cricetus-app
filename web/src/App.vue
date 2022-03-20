@@ -10,18 +10,23 @@
 </template>
 
 <script setup lang="ts">
-import Header from './Header.vue'
+import Header from './header.vue'
 import { NConfigProvider, zhCN, dateZhCN, NMessageProvider } from 'naive-ui'
 </script>
 
 <style lang="scss">
+@font-face {
+  font-family: "Cool";
+  src: url(./assets/fonts/cool.ttf) format("truetype");
+}
+
 body {
   margin: 0px;
   padding: 0px;
   overflow: hidden;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Cool", "Microsoft YaHei", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
