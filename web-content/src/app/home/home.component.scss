@@ -18,18 +18,18 @@ $app-height: 600px;
     height: $grid-height;
     background-color: aqua;
     &:nth-child(1) {
-      background-image: url(./assets/1.png);
+      background-image: url(./images/1.png);
     }
     &:nth-child(2) {
-      background-image: url(./assets/2.png);
+      background-image: url(./images/2.png);
     }
     &:nth-child(3) {
       border-radius: 0px 0px 0px 10px;
-      background-image: url(./assets/3.png);
+      background-image: url(./images/3.png);
     }
     &:nth-child(4) {
       border-radius: 0px 0px 10px 0px;
-      background-image: url(./assets/4.png);
+      background-image: url(./images/4.png);
     }
     &:hover {
       .grid-content {
