@@ -4,11 +4,11 @@
   "description": "electron app",
   "main": "./src-dist/main.js",
   "scripts": {
-    "build:web": "cd web && npm run build",
-    "start": "tsc && concurrently \"cross-env STAGE=development electron .\" \"cd web && npm run serve\"",
+    "build:web": "cd web-content && npm start",
+    "start": "tsc && concurrently \"cross-env STAGE=development electron .\" \"cd web-content && npm start\"",
     "start:electron": "tsc && electron .",
-    "pack": "tsc && cd web && npm run build && cd .. && electron-builder --dir",
-    "build": "tsc && cd web && npm run build && cd .. && electron-builder"
+    "pack": "tsc && cd web-content && npm run build && cd .. && electron-builder --dir",
+    "build": "tsc && cd web-content && npm run build && cd .. && electron-builder"
   },
   "author": "cricetus",
   "license": "ISC",

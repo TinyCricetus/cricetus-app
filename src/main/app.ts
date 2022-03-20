@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItem } from 'electron'
 import path from "path"
-import { __DEV__ } from '../env'
+import { __DEV_HOST__, __DEV__ } from '../env'
 
 export function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -16,9 +16,9 @@ export function createWindow() {
     transparent: !__DEV__
   })
   if (__DEV__) {
-    mainWindow.loadURL('http://localhost:8080')
+    mainWindow.loadURL(__DEV_HOST__)
   } else {
-    mainWindow.loadFile(path.resolve(__dirname, '../../web/dist/index.html'))
+    mainWindow.loadFile(path.resolve(__dirname, '../../web-content/dist/web-content/index.html'))
   }
 
   return mainWindow
