@@ -1,5 +1,5 @@
 export class IpcRendererService {
-  private static ins: IpcRenderer
+  private static ins: IpcRenderer = null
 
   public static get Ins() {
     if (window.ipcRenderer) {

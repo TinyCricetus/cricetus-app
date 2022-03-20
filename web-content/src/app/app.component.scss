@@ -1,19 +1,10 @@
-@font-face {
-  font-family: "Cool";
-  src: url(../assets/fonts/cool.ttf) format("truetype");
-}
-
 body {
   margin: 0px;
   padding: 0px;
   overflow: hidden;
 }
-#app {
-  font-family: "Cool", "Microsoft YaHei", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-ul,
+
+:host ::ng-deep ul,
 li {
   list-style: none;
   margin-block-start: 0;
@@ -22,6 +13,11 @@ li {
   margin-inline-end: 0px;
   padding-inline-start: 0px;
 }
+
+@font-face {
+  font-family: "Cool";
+  src: url(../assets/fonts/cool.ttf) format("truetype");
+}
 .main-container {
   position: relative;
   width: 600px;
@@ -29,4 +25,7 @@ li {
   margin: 0 auto;
   border-radius: 10px;
   overflow: hidden;
+  font-family: "Cool", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
