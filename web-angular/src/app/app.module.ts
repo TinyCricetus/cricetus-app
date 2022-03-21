@@ -9,8 +9,12 @@ import { HomeComponent } from './home/home.component';
 
 const appRoutes: Routes = [
   {
-    path: '',
+    path: 'home',
     component: HomeComponent
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
   }
 ]
 
@@ -22,7 +26,7 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(appRoutes)
+    RouterModule.forRoot(appRoutes, { useHash: true })
   ],
   providers: [],
   bootstrap: [AppComponent]

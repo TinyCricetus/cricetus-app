@@ -39,7 +39,7 @@ $app-height: 600px;
     overflow: hidden;
     width: $grid-width;
     height: $grid-height;
-    background-color: aqua;
+    background-color: white;
     &:nth-child(1) {
       background-image: url(./assets/1.png);
     }
