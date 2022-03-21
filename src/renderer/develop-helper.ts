@@ -1,6 +1,6 @@
-import { __DEV_HOST__ } from "src/env"
+import { __DEV_HOST__ } from "../env"
 
-export async function checkWebAvailable(onWebAvailable: () => void) {
+export function checkWebAvailable(onWebAvailable: () => void) {
   setTimeout(async () => {
     let response = null
     try {
