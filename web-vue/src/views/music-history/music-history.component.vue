@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { IpcRendererService } from '@/services/IpcRenderer.service'
+import { IpcRendererService } from '@/services/ipc-renderer.service'
 import { ref } from 'vue'
 import { NPopover, NButton, useMessage } from 'naive-ui'
 

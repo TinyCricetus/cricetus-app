@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NTimePicker, NButton, useMessage } from 'naive-ui'
-import { IpcRendererService } from '@/services/IpcRenderer.service';
+import { IpcRendererService } from '@/services/ipc-renderer.service';
 
 const timePickerValue = ref(0)
 const message = useMessage()

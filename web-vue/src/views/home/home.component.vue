@@ -15,7 +15,7 @@ const router = useRouter()
 const menuItems = [
   { index: 1, content: '自动关机部署', itemFunction: () => { router.push('/shutdown') } },
   { index: 2, content: '网易云听歌记录', itemFunction: () => { router.push('/history') } },
-  { index: 3, content: 'Markdown', itemFunction: () => { router.push('/markdown') } },
+  { index: 3, content: '编辑器', itemFunction: () => { router.push('/markdown') } },
   { index: 4, content: '更多功能，敬请期待...' }
 ]
 </script>

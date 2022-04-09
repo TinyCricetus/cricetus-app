@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
-import { IpcRendererService } from './services/IpcRenderer.service';
+import { IpcRendererService } from './services/ipc-renderer.service';
 
 function clickClose() {
   IpcRendererService.Ins.sendCloseMsg()

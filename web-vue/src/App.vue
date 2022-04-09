@@ -20,16 +20,22 @@ import { NConfigProvider, zhCN, dateZhCN, NMessageProvider } from 'naive-ui'
   src: url(./assets/fonts/cool.ttf) format("truetype");
 }
 
+@font-face {
+  font-family: "Monaco";
+  src: url(./assets/fonts/Monaco-1.ttf) format("truetype");
+}
+
 body {
   margin: 0px;
   padding: 0px;
   overflow: hidden;
-}
-#app {
-  font-family: "Cool", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+
+  font-size: 16px;
+  font-family: "Microsoft YaHei", "Monaco", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 ul,
 li {
   list-style: none;
