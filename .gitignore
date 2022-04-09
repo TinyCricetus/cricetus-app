@@ -1,5 +1,5 @@
 node_modules
 out
 dist
-src-dist
+src-tsc
 cricetus-*.tgz

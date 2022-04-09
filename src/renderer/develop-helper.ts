@@ -1,9 +1,10 @@
+import { __DEV_HOST__ } from "../env"
 
-export async function checkWebAvailable(onWebAvailable: () => void) {
+export function checkWebAvailable(onWebAvailable: () => void) {
   setTimeout(async () => {
     let response = null
     try {
-      response = await fetch('http://localhost:8080')
+      response = await fetch(__DEV_HOST__)
     } catch (err) { }
     if (response) {
       onWebAvailable()

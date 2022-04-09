@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItem } from 'electron'
 import path from "path"
-import { __DEV__ } from '../env'
+import { __DEV_HOST__, __DEV__, __WEB_ENTRY_PATH__ } from '../env'
 
 export function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -8,7 +8,7 @@ export function createWindow() {
     width: 600,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../../src-dist/', 'preload.js'),
+      preload: path.join(__dirname, '../../src-tsc/', 'preload.js'),
       webSecurity: false
     },
     titleBarStyle: 'hidden',
@@ -16,9 +16,9 @@ export function createWindow() {
     transparent: !__DEV__
   })
   if (__DEV__) {
-    mainWindow.loadURL('http://localhost:8080')
+    mainWindow.loadURL(__DEV_HOST__)
   } else {
-    mainWindow.loadFile(path.resolve(__dirname, '../../web/dist/index.html'))
+    mainWindow.loadFile(path.resolve(__dirname, '../../', __WEB_ENTRY_PATH__))
   }
 
   return mainWindow

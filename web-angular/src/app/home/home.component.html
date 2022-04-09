@@ -1,0 +1,7 @@
+<div>
+  <ul class="grid-menu">
+    <li *ngFor="let item of menuItems" (click)="item.itemFunction">
+      <span class="grid-content">{{ item.content }}</span>
+    </li>
+  </ul>
+</div>
