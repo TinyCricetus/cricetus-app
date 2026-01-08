@@ -10,7 +10,9 @@ export const __WEB_ENTRY_PATH__ = 'web-vue/dist/index.html'
 function getServerPort() {
   if (__WEB_FRAME__ === 'vue') {
     return '8080'
-  } else {
-    return '4200'
   }
+  if (__WEB_FRAME__ === 'react') {
+    return '5173'
+  }
+  return '4200'
 }
