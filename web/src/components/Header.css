@@ -1,0 +1,51 @@
+.ui-header,
+.ui-header * {
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.1s;
+}
+
+.ui-header {
+  z-index: 66;
+  -webkit-app-region: drag;
+  width: 100%;
+  height: var(--header-height);
+  border-radius: 10px 10px 0 0;
+  position: sticky;
+  top: 0;
+}
+
+.ui-header button {
+  z-index: 67;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  height: var(--header-height);
+  width: var(--header-height);
+}
+
+.close-button {
+  background-image: url("../assets/images/CloseCircleOutline.svg");
+}
+
+.close-button:hover {
+  background-image: url("../assets/images/CloseCircleSharp.svg");
+}
+
+.close-button:active {
+  background-image: url("../assets/images/CloseCircleOutline.svg");
+}
+
+.home-button {
+  margin-left: 5px;
+  background-image: url("../assets/images/HomeOutline.svg");
+}
+
+.home-button:hover {
+  background-image: url("../assets/images/Home.svg");
+}
+
+.home-button:active {
+  background-image: url("../assets/images/HomeSharp.svg");
+}

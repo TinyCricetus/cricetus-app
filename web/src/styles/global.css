@@ -1,0 +1,47 @@
+@font-face {
+  font-family: "Cool";
+  src: url("../assets/fonts/cool.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Monaco";
+  src: url("../assets/fonts/Monaco-1.ttf") format("truetype");
+}
+
+:root {
+  --app-width: 600px;
+  --app-height: 600px;
+  --header-height: 30px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-family: "Microsoft YaHei", "Monaco", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+li {
+  list-style: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  padding-inline-start: 0;
+}
+
+.main-container {
+  position: relative;
+  width: var(--app-width);
+  height: var(--app-height);
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "Cool", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

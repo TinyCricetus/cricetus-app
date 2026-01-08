@@ -1,0 +1,45 @@
+.song-container {
+  width: var(--app-width);
+  height: calc(var(--app-height) - var(--header-height));
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: white;
+  position: relative;
+}
+
+.song-list {
+  width: var(--app-width);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.song-list li {
+  margin: 10px;
+}
+
+.song-button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  opacity: 0.95;
+}
+
+.song-button.info {
+  background-color: #4a90e2;
+}
+
+.song-button.primary {
+  background-color: #7b61ff;
+}
+
+.song-button.warning {
+  background-color: #f0a000;
+}
+
+.song-button.error {
+  background-color: #e04848;
+}
