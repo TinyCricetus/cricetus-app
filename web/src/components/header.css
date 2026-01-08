@@ -26,26 +26,26 @@
 }
 
 .close-button {
-  background-image: url("../assets/images/CloseCircleOutline.svg");
+  background-image: url("../assets/images/close-circle-outline.svg");
 }
 
 .close-button:hover {
-  background-image: url("../assets/images/CloseCircleSharp.svg");
+  background-image: url("../assets/images/close-circle-sharp.svg");
 }
 
 .close-button:active {
-  background-image: url("../assets/images/CloseCircleOutline.svg");
+  background-image: url("../assets/images/close-circle-outline.svg");
 }
 
 .home-button {
   margin-left: 5px;
-  background-image: url("../assets/images/HomeOutline.svg");
+  background-image: url("../assets/images/home-outline.svg");
 }
 
 .home-button:hover {
-  background-image: url("../assets/images/Home.svg");
+  background-image: url("../assets/images/home.svg");
 }
 
 .home-button:active {
-  background-image: url("../assets/images/HomeSharp.svg");
+  background-image: url("../assets/images/home-sharp.svg");
 }
