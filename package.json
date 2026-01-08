@@ -4,17 +4,14 @@
   "description": "electron app",
   "main": "./src-tsc/main.js",
   "scripts": {
-    "postinstall": "cd web-vue && npm install",
-    "start": "npm run start:vue",
-    "pack": "npm run pack:vue",
-    "dist": "npm run dist:vue",
-    "build:vue": "cd web-vue && npm run build",
+    "postinstall": "cd web && npm install",
+    "start": "npm run start:react",
+    "pack": "npm run pack:react",
+    "dist": "npm run dist:react",
     "build:react": "cd web && npm run build",
-    "start:vue": "tsc && concurrently \"cross-env STAGE=development FRAME=vue electron .\" \"cd web-vue && npm run serve\"",
     "start:react": "tsc && concurrently \"cross-env STAGE=development FRAME=react electron .\" \"cd web && npm run dev\"",
-    "start:electron-vue": "tsc && cross-env FRAME=vue electron .",
-    "pack:vue": "tsc && cd web-vue && npm run build && cd .. && cross-env FRAME=vue electron-builder --dir",
-    "dist:vue": "tsc && cd web-vue && npm run build && cd .. && electron-builder"
+    "pack:react": "tsc && cd web && npm run build && cd .. && cross-env FRAME=react electron-builder --dir",
+    "dist:react": "tsc && cd web && npm run build && cd .. && electron-builder"
   },
   "author": "cricetus",
   "license": "ISC",
