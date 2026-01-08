@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import './Home.css'
+import './home.css'
 
 const menuItems = [
   { id: 1, content: '自动关机部署', path: '/shutdown' },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IpcRendererService } from '../services/ipc-renderer'
-import './Header.css'
+import './header.css'
 
 export default function Header() {
   const navigate = useNavigate()

@@ -3,7 +3,7 @@ import MarkdownIt from 'markdown-it'
 import highLight from 'highlight.js'
 import storage from '../../services/storage'
 import { TEMPLATE_STRING } from './template'
-import './Markdown.css'
+import './markdown.css'
 import 'highlight.js/styles/atom-one-dark.css'
 
 type TabType = 'editor' | 'preview'

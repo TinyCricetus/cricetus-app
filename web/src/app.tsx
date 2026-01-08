@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
-import Header from './components/Header'
-import Home from './pages/home/Home'
-import Shutdown from './pages/shutdown/Shutdown'
-import MusicHistory from './pages/music-history/MusicHistory'
-import Markdown from './pages/markdown/Markdown'
+import Header from './components/header'
+import Home from './pages/home/home'
+import Shutdown from './pages/shutdown/shutdown'
+import MusicHistory from './pages/music-history/music-history'
+import Markdown from './pages/markdown/markdown'
 
 export default function App() {
   return (

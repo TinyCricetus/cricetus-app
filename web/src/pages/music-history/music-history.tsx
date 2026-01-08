@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IpcRendererService } from '../../services/ipc-renderer'
-import Toast, { ToastMessage } from '../../components/Toast'
-import './MusicHistory.css'
+import Toast, { ToastMessage } from '../../components/toast'
+import './music-history.css'
 
 interface SongData {
   name: string

@@ -1,4 +1,4 @@
-import './Toast.css'
+import './toast.css'
 
 export type ToastType = 'info' | 'success' | 'warning' | 'error'
 

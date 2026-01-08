@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IpcRendererService } from '../../services/ipc-renderer'
-import Toast, { ToastMessage } from '../../components/Toast'
-import './Shutdown.css'
+import Toast, { ToastMessage } from '../../components/toast'
+import './shutdown.css'
 
 export default function Shutdown() {
   const [timeValue, setTimeValue] = useState('')
