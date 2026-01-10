@@ -3,7 +3,7 @@ import { Editor, Element as SlateElement, Node, Transforms } from 'slate'
 import storage from '../../services/storage'
 import './rich-text.css'
 import type { Value } from 'platejs'
-import { Plate, PlateContent, PlateElement, usePlateEditor, type PlateElementProps } from 'platejs/react'
+import { Plate, PlateContent, PlateElement, usePlateEditor, type PlateElementProps, type TPlateEditor } from 'platejs/react'
 import {
   BlockquotePlugin,
   BoldPlugin,
@@ -45,39 +45,41 @@ const ToolbarButton = ({ isActive, onToggle, label, children }: ToolbarButtonPro
   </button>
 )
 
-const isMarkActive = (editor: Editor, mark: string) => {
-  const marks = Editor.marks(editor)
-  return marks ? marks[mark] === true : false
+const isMarkActive = (editor: Editor | TPlateEditor<Value>, mark: string) => {
+  const marks = Editor.marks(editor as Editor)
+  return marks ? (marks as Record<string, any>)[mark] === true : false
 }
 
-const toggleMark = (editor: Editor, mark: string) => {
+const toggleMark = (editor: Editor | TPlateEditor<Value>, mark: string) => {
   if (isMarkActive(editor, mark)) {
-    Editor.removeMark(editor, mark)
+    Editor.removeMark(editor as Editor, mark)
   } else {
-    Editor.addMark(editor, mark, true)
+    Editor.addMark(editor as Editor, mark, true)
   }
 }
 
-const isBlockActive = (editor: Editor, type: string) => {
-  if (!editor.selection) {
+const isBlockActive = (editor: Editor | TPlateEditor<Value>, type: string) => {
+  const slateEditor = editor as Editor
+  if (!slateEditor.selection) {
     return false
   }
-  const [match] = Editor.nodes(editor, {
-    at: editor.selection,
-    match: (node) => !Editor.isEditor(node) && SlateElement.isElement(node) && node.type === type
+  const [match] = Editor.nodes(slateEditor, {
+    at: slateEditor.selection,
+    match: (node) => !Editor.isEditor(node) && SlateElement.isElement(node) && (node as any).type === type
   })
   return Boolean(match)
 }
 
-const toggleBlock = (editor: Editor, type: string) => {
+const toggleBlock = (editor: Editor | TPlateEditor<Value>, type: string) => {
+  const slateEditor = editor as Editor
   const isActive = isBlockActive(editor, type)
   const newType = isActive ? NODE_PARAGRAPH : type
   Transforms.setNodes(
-    editor,
-    { type: newType },
+    slateEditor,
+    { type: newType } as any,
     {
       match: (node) =>
-        !Editor.isEditor(node) && SlateElement.isElement(node) && Editor.isBlock(editor, node)
+        !Editor.isEditor(node) && SlateElement.isElement(node) && Editor.isBlock(slateEditor, node)
     }
   )
 }
@@ -87,7 +89,7 @@ const H2Element = (props: PlateElementProps) => <PlateElement as="h2" {...props}
 const H3Element = (props: PlateElementProps) => <PlateElement as="h3" {...props} />
 const BlockquoteElement = (props: PlateElementProps) => <PlateElement as="blockquote" {...props} />
 
-const RichTextToolbar = ({ editor }: { editor: Editor }) => {
+const RichTextToolbar = ({ editor }: { editor: TPlateEditor<Value> | Editor }) => {
   return (
     <div className="md-toolbar" role="toolbar" aria-label="编辑工具">
       <div className="md-toolbar-group">
@@ -278,7 +280,7 @@ export default function RichText() {
       >
         <div className="md-editor-card">
           <div className="md-toolbar-row">
-            <RichTextToolbar editor={editor} />
+            <RichTextToolbar editor={editor as any} />
             <div className="md-meta">
               <div className={`md-save md-save--${saveState}`}>{saveLabel}</div>
               <div className="md-stats">
