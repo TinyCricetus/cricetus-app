@@ -4,7 +4,7 @@ import './home.css'
 const menuItems = [
   { id: 1, content: '自动关机部署', path: '/shutdown' },
   { id: 2, content: '网易云听歌记录', path: '/history' },
-  { id: 3, content: '富文本编辑器', path: '/rich-text' },
+  { id: 3, content: '编辑器', path: '/editor' },
   { id: 4, content: '更多功能，敬请期待...' }
 ]
 

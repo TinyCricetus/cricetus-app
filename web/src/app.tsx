@@ -3,7 +3,7 @@ import Header from './components/header'
 import Home from './pages/home/home'
 import Shutdown from './pages/shutdown/shutdown'
 import MusicHistory from './pages/music-history/music-history'
-import RichText from './pages/rich-text/rich-text'
+import Editor from './pages/editor/editor'
 
 export default function App() {
   return (
@@ -13,7 +13,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/shutdown" element={<Shutdown />} />
         <Route path="/history" element={<MusicHistory />} />
-        <Route path="/rich-text" element={<RichText />} />
+        <Route path="/editor" element={<Editor />} />
       </Routes>
     </div>
   )

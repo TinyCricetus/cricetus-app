@@ -260,6 +260,10 @@
   color: #9a9890;
 }
 
+.md-todo-list {
+  margin: 0 0 16px;
+}
+
 .md-todo-item {
   display: flex;
   align-items: flex-start;
