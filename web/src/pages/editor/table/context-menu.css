@@ -1,0 +1,128 @@
+/* 右键菜单样式 */
+.table-context-menu {
+  position: fixed;
+  z-index: 10000;
+  background: white;
+  border-radius: 8px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  min-width: 220px;
+  animation: menuFadeIn 0.15s ease-out;
+  user-select: none;
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-section {
+  margin: 4px 0;
+}
+
+.menu-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px 4px;
+  margin-bottom: 2px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+}
+
+.menu-item:hover:not(:disabled) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateX(2px);
+}
+
+.menu-item:active:not(:disabled) {
+  transform: translateX(2px) scale(0.98);
+}
+
+.menu-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.menu-item-danger {
+  color: #ff4d4f;
+}
+
+.menu-item-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+}
+
+.menu-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.menu-hint {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.menu-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e8e8e8, transparent);
+  margin: 8px 4px;
+}
+
+/* 单元格选中样式 */
+.slate-table-cell.cell-selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%) !important;
+  outline: 2px solid #667eea !important;
+  outline-offset: -2px;
+  position: relative;
+}
+
+.slate-table-cell.cell-selected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  pointer-events: none;
+}
+
+/* 框选时的鼠标样式 */
+.slate-table-cell.selecting {
+  cursor: cell;
+}

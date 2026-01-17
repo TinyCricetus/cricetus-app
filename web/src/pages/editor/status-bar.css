@@ -1,0 +1,175 @@
+/* 状态栏样式 */
+.editor-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-top: 1px solid #dee2e6;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.status-left,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.status-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.stat-item {
+  cursor: default;
+}
+
+.stat-divider {
+  color: #ced4da;
+}
+
+/* 快捷键面板 */
+.shortcuts-panel {
+  position: absolute;
+  bottom: 40px;
+  left: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  width: 320px;
+  max-height: 400px;
+  overflow: hidden;
+  animation: panelSlideUp 0.2s ease-out;
+}
+
+@keyframes panelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shortcuts-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.shortcuts-header .close-btn {
+  margin-left: auto;
+  padding: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.shortcuts-header .close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.shortcuts-content {
+  padding: 12px 0;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.shortcut-category {
+  padding: 0 16px;
+  margin-bottom: 12px;
+}
+
+.shortcut-category:last-child {
+  margin-bottom: 0;
+}
+
+.shortcut-category h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: #667eea;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.shortcut-item kbd {
+  display: inline-block;
+  min-width: 100px;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: #495057;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.shortcut-item span {
+  color: #666;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .shortcuts-panel {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
+  }
+
+  .editor-status-bar {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}

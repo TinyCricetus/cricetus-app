@@ -1,0 +1,231 @@
+/* 主工具栏样式 */
+.editor-main-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: none;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 8px;
+}
+
+/* 工具栏按钮 */
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-button:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.toolbar-button:active:not(.disabled) {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.toolbar-button.active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toolbar-button.active:hover {
+  background: white;
+  color: #764ba2;
+}
+
+.toolbar-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 下拉按钮 */
+.toolbar-dropdown-wrapper {
+  position: relative;
+}
+
+.toolbar-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.toolbar-dropdown-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.toolbar-dropdown-button.table-button {
+  min-width: auto;
+  padding: 6px 8px;
+}
+
+/* 标题下拉菜单 */
+.heading-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  min-width: 140px;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.dropdown-icon {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 24px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* 表格网格选择器 */
+.table-grid-selector {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.grid-label {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.grid-row {
+  display: flex;
+  gap: 3px;
+}
+
+.grid-cell {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  background: white;
+}
+
+.grid-cell:hover {
+  border-color: #667eea;
+}
+
+.grid-cell.highlighted {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border-color: #667eea;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .editor-main-toolbar {
+    padding: 6px 12px;
+    gap: 2px;
+  }
+
+  .toolbar-button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .toolbar-divider {
+    margin: 0 4px;
+    height: 20px;
+  }
+
+  .toolbar-dropdown-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+}

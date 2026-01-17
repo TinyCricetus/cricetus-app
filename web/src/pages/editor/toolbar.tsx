@@ -1,240 +1,410 @@
-import { useState, type ReactNode } from 'react'
-import type { Value } from 'platejs'
-import type { TPlateEditor } from 'platejs/react'
-import { Editor, Element as SlateElement, Transforms } from 'slate'
+import { useSlate } from 'slate-react'
+import { Editor, Transforms, Element } from 'slate'
 import {
-  NODE_BLOCKQUOTE,
-  NODE_CODE_BLOCK,
-  NODE_H1,
-  NODE_H2,
-  NODE_H3,
-  NODE_LINK,
-  NODE_OL,
-  NODE_TODO_LIST,
-  NODE_UL
-} from './constants'
-import {
-  isBlockActive,
-  isMarkActive,
-  toggleBlock,
-  toggleCodeBlock,
-  toggleList,
-  toggleMark,
-  toggleTodoList
-} from './commands'
+  Bold,
+  Italic,
+  Underline,
+  Code,
+  Quote,
+  List,
+  ListOrdered,
+  Undo2,
+  Redo2,
+  ChevronDown,
+  Table as TableIcon,
+} from 'lucide-react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { HistoryEditor } from 'slate-history'
+import { insertTable } from './table'
+import './toolbar.css'
 
-type AnyEditor = TPlateEditor<Value> | Editor
+type FormatType = 'bold' | 'italic' | 'underline' | 'code'
+type BlockType = 'paragraph' | 'heading' | 'quote' | 'code' | 'order-list' | 'bullet-list'
 
-type ToolbarButtonProps = {
-  isActive: boolean
-  onToggle: () => void
-  label: string
-  children: ReactNode
+interface ToolbarButtonProps {
+  active?: boolean
+  disabled?: boolean
+  onMouseDown: (e: React.MouseEvent) => void
+  title: string
+  children: React.ReactNode
 }
 
-const ToolbarButton = ({ isActive, onToggle, label, children }: ToolbarButtonProps) => (
-  <button
-    type="button"
-    className="md-toolbar-btn"
-    aria-pressed={isActive}
-    aria-label={label}
-    title={label}
-    onMouseDown={(event) => {
-      event.preventDefault()
-      onToggle()
-    }}
-  >
-    {children}
-  </button>
-)
+function ToolbarButton({ active, disabled, onMouseDown, title, children }: ToolbarButtonProps) {
+  return (
+    <button
+      className={`toolbar-button ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+      onMouseDown={onMouseDown}
+      title={title}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  )
+}
 
-export const EditorToolbar = ({ editor }: { editor: AnyEditor }) => {
-  const [linkUrl, setLinkUrl] = useState('')
-  const [showLinkInput, setShowLinkInput] = useState(false)
+function ToolbarDivider() {
+  return <div className="toolbar-divider" />
+}
 
-  const insertLink = () => {
-    const slateEditor = editor as Editor
-    if (!slateEditor.selection) {
-      setShowLinkInput(false)
-      return
-    }
+// 检查当前文本格式是否激活
+function isMarkActive(editor: Editor, format: FormatType): boolean {
+  const marks = Editor.marks(editor) as Record<string, boolean> | null
+  return marks ? marks[format] === true : false
+}
 
-    if (!linkUrl.trim()) {
-      const [match] = Editor.nodes(slateEditor, {
-        match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === NODE_LINK
-      })
-      if (match) {
-        Transforms.unwrapNodes(slateEditor, {
-          match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === NODE_LINK
-        })
-      }
-      setShowLinkInput(false)
-      return
-    }
-
-    const [match] = Editor.nodes(slateEditor, {
-      match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === NODE_LINK
-    })
-
-    if (match) {
-      Transforms.setNodes(
-        slateEditor,
-        { url: linkUrl } as any,
-        {
-          match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === NODE_LINK
-        }
-      )
-    } else {
-      const range = Editor.range(slateEditor, slateEditor.selection)
-      const isCollapsed =
-        range.anchor.path.join(',') === range.focus.path.join(',') && range.anchor.offset === range.focus.offset
-      if (isCollapsed) {
-        Transforms.insertNodes(slateEditor, {
-          type: NODE_LINK,
-          url: linkUrl,
-          children: [{ text: linkUrl }]
-        } as any)
-      } else {
-        const link = {
-          type: NODE_LINK,
-          url: linkUrl,
-          children: []
-        }
-        Transforms.wrapNodes(slateEditor, link as any, { split: true })
-      }
-    }
-
-    setLinkUrl('')
-    setShowLinkInput(false)
+// 切换文本格式
+function toggleMark(editor: Editor, format: FormatType) {
+  const isActive = isMarkActive(editor, format)
+  if (isActive) {
+    Editor.removeMark(editor, format)
+  } else {
+    Editor.addMark(editor, format, true)
   }
+}
+
+// 检查块类型是否激活
+function isBlockActive(editor: Editor, blockType: BlockType, level?: number): boolean {
+  const { selection } = editor
+  if (!selection) return false
+
+  const [match] = Array.from(
+    Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: (n) => {
+        if (!Element.isElement(n)) return false
+        if (blockType === 'heading' && level) {
+          return n.type === 'heading' && (n as any).level === level
+        }
+        return n.type === blockType
+      },
+    }),
+  )
+
+  return !!match
+}
+
+// 设置块类型
+function setBlockType(editor: Editor, blockType: BlockType, properties: Record<string, any> = {}) {
+  const isActive = isBlockActive(editor, blockType, properties.level)
+
+  // 如果已经是这个类型，转换为段落
+  if (isActive) {
+    Transforms.setNodes(editor, { type: 'paragraph' } as any)
+  } else {
+    Transforms.setNodes(editor, { type: blockType, ...properties } as any)
+  }
+}
+
+// 表格网格选择器
+function TableGridSelector({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (rows: number, cols: number) => void
+  onClose: () => void
+}) {
+  const [hoverRow, setHoverRow] = useState(0)
+  const [hoverCol, setHoverCol] = useState(0)
+  const gridSize = 6
 
   return (
-    <div className="md-toolbar" role="toolbar" aria-label="编辑工具">
-      <div className="md-toolbar-group">
-        <span className="md-toolbar-label">文本</span>
-        <ToolbarButton
-          isActive={isMarkActive(editor as any, 'bold')}
-          onToggle={() => toggleMark(editor as any, 'bold')}
-          label="加粗 (Ctrl+B)"
-        >
-          <strong>B</strong>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={isMarkActive(editor as any, 'italic')}
-          onToggle={() => toggleMark(editor as any, 'italic')}
-          label="斜体 (Ctrl+I)"
-        >
-          <em>I</em>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={isMarkActive(editor as any, 'underline')}
-          onToggle={() => toggleMark(editor as any, 'underline')}
-          label="下划线 (Ctrl+U)"
-        >
-          <u>U</u>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={isMarkActive(editor as any, 'strikethrough')}
-          onToggle={() => toggleMark(editor as any, 'strikethrough')}
-          label="删除线"
-        >
-          <span style={{ textDecoration: 'line-through' }}>S</span>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={isMarkActive(editor as any, 'code')}
-          onToggle={() => toggleMark(editor as any, 'code')}
-          label="行内代码"
-        >
-          <code style={{ fontSize: '12px' }}>&lt;/&gt;</code>
-        </ToolbarButton>
+    <div className="table-grid-selector" onMouseLeave={onClose}>
+      <div className="grid-label">{hoverRow > 0 ? `${hoverRow} × ${hoverCol}` : '选择表格大小'}</div>
+      <div className="grid-container">
+        {Array.from({ length: gridSize }).map((_, rowIndex) => (
+          <div key={rowIndex} className="grid-row">
+            {Array.from({ length: gridSize }).map((_, colIndex) => (
+              <div
+                key={colIndex}
+                className={`grid-cell ${rowIndex < hoverRow && colIndex < hoverCol ? 'highlighted' : ''}`}
+                onMouseEnter={() => {
+                  setHoverRow(rowIndex + 1)
+                  setHoverCol(colIndex + 1)
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  onSelect(rowIndex + 1, colIndex + 1)
+                }}
+              />
+            ))}
+          </div>
+        ))}
       </div>
+    </div>
+  )
+}
 
-      <div className="md-toolbar-group">
-        <span className="md-toolbar-label">标题</span>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_H1)} onToggle={() => toggleBlock(editor as any, NODE_H1)} label="标题 1">
-          <span>H1</span>
-        </ToolbarButton>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_H2)} onToggle={() => toggleBlock(editor as any, NODE_H2)} label="标题 2">
-          <span>H2</span>
-        </ToolbarButton>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_H3)} onToggle={() => toggleBlock(editor as any, NODE_H3)} label="标题 3">
-          <span>H3</span>
-        </ToolbarButton>
-      </div>
+// 标题下拉菜单
+function HeadingDropdown({ onSelect, onClose }: { onSelect: (level: number | null) => void; onClose: () => void }) {
+  const options = [
+    { level: null, label: '正文', icon: '¶' },
+    { level: 1, label: '标题 1', icon: 'H1' },
+    { level: 2, label: '标题 2', icon: 'H2' },
+    { level: 3, label: '标题 3', icon: 'H3' },
+    { level: 4, label: '标题 4', icon: 'H4' },
+    { level: 5, label: '标题 5', icon: 'H5' },
+    { level: 6, label: '标题 6', icon: 'H6' },
+  ]
 
-      <div className="md-toolbar-group">
-        <span className="md-toolbar-label">列表</span>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_UL)} onToggle={() => toggleList(editor as any, NODE_UL)} label="无序列表">
-          <span>•</span>
-        </ToolbarButton>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_OL)} onToggle={() => toggleList(editor as any, NODE_OL)} label="有序列表">
-          <span>1.</span>
-        </ToolbarButton>
-        <ToolbarButton isActive={isBlockActive(editor as any, NODE_TODO_LIST)} onToggle={() => toggleTodoList(editor as any)} label="代办事项">
-          <span>☐</span>
-        </ToolbarButton>
-      </div>
-
-      <div className="md-toolbar-group">
-        <span className="md-toolbar-label">结构</span>
-        <ToolbarButton
-          isActive={isBlockActive(editor as any, NODE_BLOCKQUOTE)}
-          onToggle={() => toggleBlock(editor as any, NODE_BLOCKQUOTE)}
-          label="引用"
-        >
-          <span>&gt;</span>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={isBlockActive(editor as any, NODE_CODE_BLOCK)}
-          onToggle={() => toggleCodeBlock(editor as any)}
-          label="代码块"
-        >
-          <code style={{ fontSize: '12px' }}>{'{}'}</code>
-        </ToolbarButton>
-        <ToolbarButton
-          isActive={showLinkInput}
-          onToggle={() => {
-            setShowLinkInput(!showLinkInput)
-            if (!showLinkInput) {
-              setTimeout(() => {
-                const input = document.querySelector('.md-link-input') as HTMLInputElement
-                input?.focus()
-              }, 0)
-            }
+  return (
+    <div className="heading-dropdown">
+      {options.map((opt) => (
+        <button
+          key={opt.level ?? 'p'}
+          className="dropdown-item"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            onSelect(opt.level)
+            onClose()
           }}
-          label="链接"
         >
-          <span>🔗</span>
+          <span className="dropdown-icon">{opt.icon}</span>
+          <span>{opt.label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function EditorToolbar() {
+  const editor = useSlate()
+  const [showHeadingMenu, setShowHeadingMenu] = useState(false)
+  const [showTableGrid, setShowTableGrid] = useState(false)
+  const headingRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLDivElement>(null)
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (headingRef.current && !headingRef.current.contains(e.target as Node)) {
+        setShowHeadingMenu(false)
+      }
+      if (tableRef.current && !tableRef.current.contains(e.target as Node)) {
+        setShowTableGrid(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // 获取当前标题级别
+  const getCurrentHeadingLevel = useCallback((): number | null => {
+    const { selection } = editor
+    if (!selection) return null
+
+    const [match] = Array.from(
+      Editor.nodes(editor, {
+        at: Editor.unhangRange(editor, selection),
+        match: (n) => Element.isElement(n) && n.type === 'heading',
+      }),
+    )
+
+    if (match) {
+      return (match[0] as any).level
+    }
+    return null
+  }, [editor])
+
+  const currentHeadingLevel = getCurrentHeadingLevel()
+  const headingLabel = currentHeadingLevel ? `H${currentHeadingLevel}` : '正文'
+
+  // 撤销/重做
+  const canUndo = useMemo(() => {
+    try {
+      return (editor as any).history?.undos?.length > 0
+    } catch {
+      return false
+    }
+  }, [editor])
+
+  const canRedo = useMemo(() => {
+    try {
+      return (editor as any).history?.redos?.length > 0
+    } catch {
+      return false
+    }
+  }, [editor])
+
+  return (
+    <div className="editor-main-toolbar">
+      {/* 撤销/重做 */}
+      <div className="toolbar-group">
+        <ToolbarButton
+          title="撤销 (Ctrl+Z)"
+          disabled={!canUndo}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            HistoryEditor.undo(editor as any)
+          }}
+        >
+          <Undo2 size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          title="重做 (Ctrl+Y)"
+          disabled={!canRedo}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            HistoryEditor.redo(editor as any)
+          }}
+        >
+          <Redo2 size={18} />
         </ToolbarButton>
       </div>
 
-      {showLinkInput && (
-        <div className="md-link-input-wrapper">
-          <input
-            type="text"
-            className="md-link-input"
-            placeholder="输入链接地址..."
-            value={linkUrl}
-            onChange={(e) => setLinkUrl(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                insertLink()
-              } else if (e.key === 'Escape') {
-                setShowLinkInput(false)
-                setLinkUrl('')
-              }
+      <ToolbarDivider />
+
+      {/* 标题选择 */}
+      <div className="toolbar-group" ref={headingRef}>
+        <div className="toolbar-dropdown-wrapper">
+          <button
+            className="toolbar-dropdown-button"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              setShowHeadingMenu(!showHeadingMenu)
             }}
-            onBlur={() => {
-              setTimeout(() => {
-                if (!document.activeElement?.closest('.md-link-input-wrapper')) {
-                  insertLink()
+          >
+            <span>{headingLabel}</span>
+            <ChevronDown size={14} />
+          </button>
+          {showHeadingMenu && (
+            <HeadingDropdown
+              onSelect={(level) => {
+                if (level === null) {
+                  Transforms.setNodes(editor, { type: 'paragraph' } as any)
+                } else {
+                  Transforms.setNodes(editor, { type: 'heading', level } as any)
                 }
-              }, 200)
-            }}
-          />
+              }}
+              onClose={() => setShowHeadingMenu(false)}
+            />
+          )}
         </div>
-      )}
+      </div>
+
+      <ToolbarDivider />
+
+      {/* 文本格式 */}
+      <div className="toolbar-group">
+        <ToolbarButton
+          active={isMarkActive(editor, 'bold')}
+          title="粗体 (Ctrl+B)"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            toggleMark(editor, 'bold')
+          }}
+        >
+          <Bold size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          active={isMarkActive(editor, 'italic')}
+          title="斜体 (Ctrl+I)"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            toggleMark(editor, 'italic')
+          }}
+        >
+          <Italic size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          active={isMarkActive(editor, 'underline')}
+          title="下划线 (Ctrl+U)"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            toggleMark(editor, 'underline')
+          }}
+        >
+          <Underline size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          active={isMarkActive(editor, 'code')}
+          title="行内代码 (Ctrl+`)"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            toggleMark(editor, 'code')
+          }}
+        >
+          <Code size={18} />
+        </ToolbarButton>
+      </div>
+
+      <ToolbarDivider />
+
+      {/* 块级元素 */}
+      <div className="toolbar-group">
+        <ToolbarButton
+          active={isBlockActive(editor, 'quote')}
+          title="引用块"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            setBlockType(editor, 'quote')
+          }}
+        >
+          <Quote size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          active={isBlockActive(editor, 'bullet-list')}
+          title="无序列表"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            setBlockType(editor, 'bullet-list', { indent: 0, uuid: Math.random().toString(36).substring(2, 15) })
+          }}
+        >
+          <List size={18} />
+        </ToolbarButton>
+        <ToolbarButton
+          active={isBlockActive(editor, 'order-list')}
+          title="有序列表"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            setBlockType(editor, 'order-list', { indent: 0, uuid: Math.random().toString(36).substring(2, 15) })
+          }}
+        >
+          <ListOrdered size={18} />
+        </ToolbarButton>
+      </div>
+
+      <ToolbarDivider />
+
+      {/* 分隔线 / 代码块 */}
+      <div className="toolbar-group">
+        <ToolbarButton
+          active={isBlockActive(editor, 'code')}
+          title="代码块"
+          onMouseDown={(e) => {
+            e.preventDefault()
+            setBlockType(editor, 'code')
+          }}
+        >
+          <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 600 }}>{'{}'}</span>
+        </ToolbarButton>
+      </div>
+
+      <ToolbarDivider />
+
+      {/* 表格 */}
+      <div className="toolbar-group" ref={tableRef}>
+        <div className="toolbar-dropdown-wrapper">
+          <button
+            className="toolbar-dropdown-button table-button"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              setShowTableGrid(!showTableGrid)
+            }}
+          >
+            <TableIcon size={18} />
+            <ChevronDown size={14} />
+          </button>
+          {showTableGrid && (
+            <TableGridSelector
+              onSelect={(rows, cols) => {
+                insertTable(editor, { rowCount: rows, colCount: cols })
+                setShowTableGrid(false)
+              }}
+              onClose={() => setShowTableGrid(false)}
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }
