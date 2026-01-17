@@ -24,36 +24,144 @@ const defaultValue: any[] = [
   {
     type: 'heading',
     level: 1,
-    children: [{ text: '欢迎使用 Winkdown 编辑器' }],
+    children: [{ text: '欢迎使用 Cricetus 编辑器' }],
   },
-
   {
     type: 'paragraph',
-    children: [{ text: '这是一个功能丰富的富文本编辑器。试试以下功能：' }],
+    children: [{ text: '这是一个功能丰富的富文本编辑器，支持多种 Markdown 语法和快捷操作。' }],
   },
   {
-    type: 'order-list',
-    indent: 0,
-    uuid: generateUuid(),
-    children: [{ text: '输入 # 创建标题' }],
+    type: 'heading',
+    level: 2,
+    children: [{ text: '快捷命令' }],
   },
   {
-    type: 'order-list',
-    indent: 0,
-    uuid: generateUuid(),
-    children: [{ text: '输入 > 创建引用' }],
+    type: 'paragraph',
+    children: [{ text: '输入 / 可以打开命令菜单，快速插入各种块级元素：' }],
   },
   {
-    type: 'order-list',
+    type: 'bullet-list',
     indent: 0,
     uuid: generateUuid(),
-    children: [{ text: '输入 ``` 创建代码块' }],
+    children: [{ text: '标题（一级到六级）' }],
   },
   {
-    type: 'order-list',
+    type: 'bullet-list',
     indent: 0,
     uuid: generateUuid(),
-    children: [{ text: '使用 Tab 缩进列表' }],
+    children: [{ text: '有序列表、无序列表、任务列表' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '引用、代码块、表格' }],
+  },
+  {
+    type: 'heading',
+    level: 2,
+    children: [{ text: 'Markdown 语法' }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: '也可以直接使用 Markdown 语法：' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 # 加空格创建一级标题（## 二级，### 三级...）' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 > 加空格创建引用块' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 ``` 加空格创建代码块' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 - [ ] 加空格创建任务列表' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 1. 加空格创建有序列表' }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: '输入 - 加空格创建无序列表' }],
+  },
+  {
+    type: 'heading',
+    level: 2,
+    children: [{ text: '文本格式' }],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      { text: '选中文本后使用工具栏或快捷键：' },
+    ],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: 'Ctrl+B 加粗', bold: true }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: 'Ctrl+I 斜体', italic: true }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: 'Ctrl+U 下划线', underline: true }],
+  },
+  {
+    type: 'bullet-list',
+    indent: 0,
+    uuid: generateUuid(),
+    children: [{ text: 'Ctrl+` 行内代码', code: true }],
+  },
+  {
+    type: 'heading',
+    level: 2,
+    children: [{ text: '示例：任务列表' }],
+  },
+  {
+    type: 'task-list',
+    indent: 0,
+    uuid: generateUuid(),
+    checked: true,
+    children: [{ text: '完成编辑器基础功能' }],
+  },
+  {
+    type: 'task-list',
+    indent: 0,
+    uuid: generateUuid(),
+    checked: true,
+    children: [{ text: '添加斜杠命令菜单' }],
+  },
+  {
+    type: 'task-list',
+    indent: 0,
+    uuid: generateUuid(),
+    checked: false,
+    children: [{ text: '开始创作你的内容！' }],
   },
   {
     type: 'paragraph',
@@ -72,8 +180,17 @@ function parseStoredValue(stored: string | null): Descendant[] {
   try {
     const parsed = JSON.parse(stored)
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // 这里的类型检查非常宽松，实际项目中可能需要更严格的校验
-      // 或者使用一个 normalize 函数来修复不合规的结构
+      // 检查是否包含旧的 'p' 类型节点，如果有则清空数据并返回默认值
+      const hasOldFormat = parsed.some((node: any) => {
+        return node && typeof node === 'object' && node.type === 'p'
+      })
+
+      if (hasOldFormat) {
+        console.log('检测到旧格式数据，已清空并加载默认内容')
+        storage.setMarkdownContent('')
+        return defaultValue
+      }
+
       return parsed as Descendant[]
     }
   } catch (e) {
@@ -261,18 +378,24 @@ function TaskListComponent(props: RenderElementProps) {
   const { indent, checked } = element as TaskListElement
 
   const handleCheckboxChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.MouseEvent<HTMLInputElement>) => {
       e.preventDefault()
       const path = ReactEditor.findPath(editor, element)
-      Transforms.setNodes(editor, { checked: e.target.checked } as any, { at: path })
+      // 直接基于当前状态取反，而不是依赖 e.target.checked
+      Transforms.setNodes(editor, { checked: !checked } as any, { at: path })
     },
-    [editor, element]
+    [editor, element, checked]
   )
 
   return (
     <div {...attributes} className="task-list-item" style={{ paddingLeft: `${indent * 2}em` }}>
       <span contentEditable={false} className="task-list-checkbox-wrapper">
-        <input type="checkbox" checked={checked} onChange={handleCheckboxChange} className="task-list-checkbox" />
+        <input
+          type="checkbox"
+          checked={checked}
+          onMouseDown={handleCheckboxChange}
+          className="task-list-checkbox"
+        />
       </span>
       <span className="task-list-content">{children}</span>
     </div>
@@ -325,8 +448,9 @@ export default function EditorComponent() {
         return
       }
 
-      // 处理斜杠命令触发
-      if (event.key === '/') {
+      // 处理斜杠命令触发（兼容 Electron 和浏览器）
+      const isSlashKey = event.key === '/' || event.code === 'Slash' || (event.keyCode === 191 && !event.shiftKey)
+      if (isSlashKey) {
         const { selection } = editor
         if (selection && Range.isCollapsed(selection)) {
           const [block] = Editor.nodes(editor, {
