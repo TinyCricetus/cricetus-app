@@ -23,6 +23,13 @@ export interface CodeElement extends BaseElement {
   type: 'code'
 }
 
+export interface TaskListElement extends BaseElement {
+  type: 'task-list'
+  uuid: string
+  indent: number
+  checked: boolean
+}
+
 export interface FormattedText extends BaseText {
   bold?: boolean
   italic?: boolean
@@ -67,6 +74,7 @@ export type CustomElement =
   | ListElement
   | QuoteElement
   | CodeElement
+  | TaskListElement
   | TableElement
   | TableRowElement
   | TableCellElement

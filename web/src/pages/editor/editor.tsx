@@ -1,4 +1,5 @@
-﻿import { useMemo, KeyboardEvent, useCallback, useEffect, useState } from 'react'
+﻿import { useMemo, KeyboardEvent, useCallback, useEffect, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import './editor.css'
 import {
   Editable,
@@ -11,10 +12,11 @@ import {
 } from 'slate-react'
 import { Descendant, Editor, Element, Transforms, createEditor, Text, Range, Point, Node, Path } from 'slate'
 import { withHistory } from 'slate-history'
-import { ListElement, HeadingElement, FormattedText } from './slate-types'
+import { ListElement, HeadingElement, FormattedText, TaskListElement } from './slate-types'
 import { Table, TableRow, TableCell, TableToolbar, withTable } from './table'
 import { EditorToolbar } from './toolbar'
 import { EditorStatusBar } from './status-bar'
+import { SlashMenu } from './slash-menu'
 import storage from '../../services/storage'
 import { STORAGE_DEBOUNCE_MS } from './constants'
 
@@ -90,6 +92,8 @@ function renderElement(props: RenderElementProps) {
     case 'order-list':
     case 'bullet-list':
       return <ListComponent {...props} />
+    case 'task-list':
+      return <TaskListComponent {...props} />
     case 'quote':
       return <QuoteComponent {...props} />
     case 'code':
@@ -128,9 +132,9 @@ function renderLeaf(props: RenderLeafProps) {
 function ParagraphComponent(props: RenderElementProps) {
   const { attributes, children } = props
   return (
-    <p {...attributes} className="paragraph">
+    <div {...attributes} className="paragraph">
       {children}
-    </p>
+    </div>
   )
 }
 
@@ -251,11 +255,41 @@ function CodeComponent(props: RenderElementProps) {
   )
 }
 
+function TaskListComponent(props: RenderElementProps) {
+  const { attributes, children, element } = props
+  const editor = useSlateStatic()
+  const { indent, checked } = element as TaskListElement
+
+  const handleCheckboxChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault()
+      const path = ReactEditor.findPath(editor, element)
+      Transforms.setNodes(editor, { checked: e.target.checked } as any, { at: path })
+    },
+    [editor, element]
+  )
+
+  return (
+    <div {...attributes} className="task-list-item" style={{ paddingLeft: `${indent * 2}em` }}>
+      <span contentEditable={false} className="task-list-checkbox-wrapper">
+        <input type="checkbox" checked={checked} onChange={handleCheckboxChange} className="task-list-checkbox" />
+      </span>
+      <span className="task-list-content">{children}</span>
+    </div>
+  )
+}
+
 export default function EditorComponent() {
   const editor = useMemo(() => withTable(withHistory(withReact(createEditor()))), [])
 
   // 初始化时从 storage 读取
   const [value, setValue] = useState<Descendant[]>(() => parseStoredValue(storage.getMarkdownContent()))
+
+  // 斜杠命令菜单状态
+  const [showSlashMenu, setShowSlashMenu] = useState(false)
+  const [slashMenuSearch, setSlashMenuSearch] = useState('')
+  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 })
+  const slashMenuRef = useRef<HTMLDivElement>(null)
 
   // 自动保存
   useEffect(() => {
@@ -284,11 +318,58 @@ export default function EditorComponent() {
       const { selection } = editor
       if (!selection) return
 
-      // Tab 键处理列表缩进
+      // 处理斜杠命令菜单的 Escape 键关闭
+      if (event.key === 'Escape' && showSlashMenu) {
+        event.preventDefault()
+        setShowSlashMenu(false)
+        return
+      }
+
+      // 处理斜杠命令触发
+      if (event.key === '/') {
+        const { selection } = editor
+        if (selection && Range.isCollapsed(selection)) {
+          const [block] = Editor.nodes(editor, {
+            match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+            mode: 'lowest',
+          })
+
+          if (block) {
+            const [node] = block
+            if (Element.isElement(node) && node.type === 'paragraph') {
+              const text = Node.string(node)
+              // 只在空行或开头触发斜杠菜单
+              if (text === '' || selection.anchor.offset === 0) {
+                event.preventDefault()
+                // 插入斜杠字符
+                Transforms.insertText(editor, '/')
+                setShowSlashMenu(true)
+                setSlashMenuSearch('')
+
+                // 获取光标位置
+                const domSelection = window.getSelection()
+                if (domSelection && domSelection.rangeCount > 0) {
+                  const domRange = domSelection.getRangeAt(0)
+                  const rect = domRange.getBoundingClientRect()
+                  setSlashMenuPosition({
+                    top: rect.bottom + window.scrollY,
+                    left: rect.left + window.scrollX,
+                  })
+                }
+                return
+              }
+            }
+          }
+        }
+      }
+
+      // Tab 键处理列表缩进（包括任务列表）
       if (event.key === 'Tab') {
         event.preventDefault()
         const [match] = Editor.nodes(editor, {
-          match: (node) => Element.isElement(node) && (node.type === 'order-list' || node.type === 'bullet-list'),
+          match: (node) =>
+            Element.isElement(node) &&
+            (node.type === 'order-list' || node.type === 'bullet-list' || node.type === 'task-list'),
         })
 
         if (match) {
@@ -304,15 +385,17 @@ export default function EditorComponent() {
         }
       }
 
-      // Enter 键处理
+      // Enter 键处理（包括任务列表）
       if (event.key === 'Enter') {
         const [match] = Editor.nodes(editor, {
-          match: (node) => Element.isElement(node) && (node.type === 'order-list' || node.type === 'bullet-list'),
+          match: (node) =>
+            Element.isElement(node) &&
+            (node.type === 'order-list' || node.type === 'bullet-list' || node.type === 'task-list'),
         })
 
         if (match) {
           const [node, path] = match
-          const listNode = node as ListElement
+          const listNode = node as ListElement | TaskListElement
           const { selection } = editor
 
           if (selection && Range.isCollapsed(selection)) {
@@ -324,20 +407,35 @@ export default function EditorComponent() {
               // 如果当前行为空，转换为段落
               Transforms.setNodes(editor, { type: 'paragraph' })
               Transforms.unwrapNodes(editor, {
-                match: (n) => Element.isElement(n) && (n.type === 'order-list' || n.type === 'bullet-list'),
+                match: (n) =>
+                  Element.isElement(n) &&
+                  (n.type === 'order-list' || n.type === 'bullet-list' || n.type === 'task-list'),
               })
               return
             } else {
               // 如果当前行不为空，创建新的列表项
               event.preventDefault()
-              const newListItem: ListElement = {
-                type: listNode.type,
-                indent: listNode.indent || 0,
-                uuid: generateUuid(),
-                children: [{ text: '' }],
+
+              if (listNode.type === 'task-list') {
+                const taskNode = listNode as TaskListElement
+                const newTaskItem: TaskListElement = {
+                  type: 'task-list',
+                  indent: taskNode.indent || 0,
+                  uuid: generateUuid(),
+                  checked: false,
+                  children: [{ text: '' }],
+                }
+                Transforms.insertNodes(editor, newTaskItem)
+              } else {
+                const newListItem: ListElement = {
+                  type: listNode.type as 'order-list' | 'bullet-list',
+                  indent: listNode.indent || 0,
+                  uuid: generateUuid(),
+                  children: [{ text: '' }],
+                }
+                Transforms.insertNodes(editor, newListItem)
               }
-              // 在当前位置插入新节点
-              Transforms.insertNodes(editor, newListItem)
+
               // 移动光标到新节点
               Transforms.move(editor)
               return
@@ -351,9 +449,11 @@ export default function EditorComponent() {
         const { selection } = editor
         if (!selection || !Range.isCollapsed(selection)) return
 
-        // 处理列表项
+        // 处理列表项（包括任务列表）
         const [listMatch] = Editor.nodes(editor, {
-          match: (node) => Element.isElement(node) && (node.type === 'order-list' || node.type === 'bullet-list'),
+          match: (node) =>
+            Element.isElement(node) &&
+            (node.type === 'order-list' || node.type === 'bullet-list' || node.type === 'task-list'),
         })
 
         if (listMatch && selection) {
@@ -365,9 +465,29 @@ export default function EditorComponent() {
             // 在列表项开头按退格，转换为段落
             Transforms.setNodes(editor, { type: 'paragraph' })
             Transforms.unwrapNodes(editor, {
-              match: (n) => Element.isElement(n) && (n.type === 'order-list' || n.type === 'bullet-list'),
+              match: (n) =>
+                Element.isElement(n) &&
+                (n.type === 'order-list' || n.type === 'bullet-list' || n.type === 'task-list'),
             })
             return
+          }
+        }
+
+        // 处理斜杠菜单关闭
+        if (showSlashMenu) {
+          const [block] = Editor.nodes(editor, {
+            match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+            mode: 'lowest',
+          })
+          if (block) {
+            const [node] = block
+            const text = Node.string(node)
+            if (text === '/') {
+              setShowSlashMenu(false)
+              setSlashMenuSearch('')
+            } else if (text.startsWith('/')) {
+              setSlashMenuSearch(text.slice(1, -1))
+            }
           }
         }
 
@@ -437,6 +557,21 @@ export default function EditorComponent() {
             const leadingSpaces = beforeText.length - trimmedBefore.length
             const deleteStart =
               leadingSpaces > 0 ? Editor.after(editor, blockStart, { distance: leadingSpaces }) : blockStart
+
+            // 处理任务列表 (- [ ] 或 - [x])
+            const taskListMatch = trimmedBefore.match(/^-\s*\[([ x])\]$/)
+            if (taskListMatch && deleteStart) {
+              event.preventDefault()
+              const checked = taskListMatch[1] === 'x'
+              Transforms.delete(editor, { at: { anchor: deleteStart, focus: cursor } })
+              Transforms.setNodes(editor, {
+                type: 'task-list',
+                indent: 0,
+                uuid: generateUuid(),
+                checked,
+              })
+              return
+            }
 
             // 处理标题 (#, ##, ###, etc.)
             const headingMatch = trimmedBefore.match(/^(#{1,6})$/)
@@ -514,12 +649,39 @@ export default function EditorComponent() {
         }
       }
     },
-    [editor, toggleFormat],
+    [editor, toggleFormat, showSlashMenu],
   )
 
   return (
     <div className="winkdown-container">
-      <Slate editor={editor} initialValue={value} onChange={(newValue) => setValue(newValue)}>
+      <Slate
+        editor={editor}
+        initialValue={value}
+        onChange={(newValue) => {
+          setValue(newValue)
+
+          // 更新斜杠菜单搜索文本
+          if (showSlashMenu) {
+            const { selection } = editor
+            if (selection && Range.isCollapsed(selection)) {
+              const [block] = Editor.nodes(editor, {
+                match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+                mode: 'lowest',
+              })
+              if (block) {
+                const [node] = block
+                const text = Node.string(node)
+                if (text.startsWith('/')) {
+                  setSlashMenuSearch(text.slice(1))
+                } else {
+                  setShowSlashMenu(false)
+                  setSlashMenuSearch('')
+                }
+              }
+            }
+          }
+        }}
+      >
         <EditorToolbar />
 
         <TableToolbar />
@@ -529,11 +691,56 @@ export default function EditorComponent() {
           renderLeaf={renderLeaf}
           className="winkdown"
           onKeyDown={onKeyDown}
-          placeholder="开始输入... 使用 # 创建标题，> 创建引用，1. 创建列表"
+          placeholder="开始输入... 使用 / 打开命令菜单，# 创建标题，> 创建引用，- [ ] 创建任务列表"
         />
 
         <EditorStatusBar />
       </Slate>
+
+      {showSlashMenu &&
+        createPortal(
+          <div
+            ref={slashMenuRef}
+            style={{
+              position: 'absolute',
+              top: slashMenuPosition.top,
+              left: slashMenuPosition.left,
+              zIndex: 1000,
+            }}
+          >
+            <SlashMenu
+              editor={editor}
+              searchText={slashMenuSearch}
+              onSelectCommand={() => {
+                setShowSlashMenu(false)
+                setSlashMenuSearch('')
+                // 删除斜杠字符和搜索文本
+                const { selection } = editor
+                if (selection) {
+                  const [block] = Editor.nodes(editor, {
+                    match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+                    mode: 'lowest',
+                  })
+                  if (block) {
+                    const [node, path] = block
+                    const text = Node.string(node)
+                    if (text.startsWith('/')) {
+                      const start = Editor.start(editor, path)
+                      const end = Editor.end(editor, path)
+                      Transforms.delete(editor, {
+                        at: {
+                          anchor: start,
+                          focus: { ...start, offset: text.length },
+                        },
+                      })
+                    }
+                  }
+                }
+              }}
+            />
+          </div>,
+          document.body
+        )}
     </div>
   )
 }
